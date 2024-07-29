@@ -109,21 +109,76 @@ def create_tables():
 `	`Помимо основных полей, таких как id пользователя, дата и время добавления, есть поля label и used, поле label используется для обозначения класса, к которому принадлежит сообщение, поле used используется чтобы помечать вопросы, которые уже были использованы при дообучении (в том случае, если модель показала метрику accuracy больше чем максимальная)
 
 `	`Для смены флага used используется следующая функция:
-
-|<p>def mark\_as\_used():</p><p>`    `conn = sqlite3.connect("/home/dev-bot/ssu\_project/scripts/" + DATABASE\_NAME)</p><p>`    `cursor = conn.cursor()</p><p>`    `cursor.execute('''</p><p>`    `UPDATE questions SET used = 1 WHERE used = 0</p><p>`    `''')</p><p>`    `conn.commit()</p><p>`    `conn.close()</p>|
-| :- |
+```python
+def mark_as_used():
+    conn = sqlite3.connect("/home/dev-bot/ssu_project/scripts/" + DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+    UPDATE questions SET used = 1 WHERE used = 0
+    ''')
+    conn.commit()
+    conn.close()
+```
 
 `	`Для работы с базой данных были описаны функции добавления новых записей и т.д.
 
-|<p>def add\_question(user\_id, question, label):</p><p>`    `conn = sqlite3.connect("/home/dev-bot/ssu\_project/scripts/" + DATABASE\_NAME)</p><p>`    `cursor = conn.cursor()</p><p>`    `cursor.execute('''</p><p>`    `INSERT INTO questions (user\_id, question, label, used)</p><p>`    `VALUES (?, ?, ?, 0)</p><p>`    `''', (user\_id, question, label))</p><p>`    `conn.commit()</p><p>`    `conn.close()</p><p></p><p>def add\_unclassified\_question(user\_id, question):</p><p>`    `conn = sqlite3.connect("/home/dev-bot/ssu\_project/scripts/" + DATABASE\_NAME)</p><p>`    `cursor = conn.cursor()</p><p>`    `cursor.execute('''</p><p>`    `INSERT INTO unclassified\_questions (user\_id, question)</p><p>`    `VALUES (?, ?)</p><p>`    `''', (user\_id, question))</p><p>`    `conn.commit()</p><p>`    `conn.close()</p><p></p><p>def add\_model\_accuracy(accuracy):</p><p>`    `conn = sqlite3.connect("/home/dev-bot/ssu\_project/scripts/" + DATABASE\_NAME)</p><p>`    `cursor = conn.cursor()</p><p>`    `cursor.execute('''</p><p>`    `INSERT INTO model\_accuracy (accuracy)</p><p>`    `VALUES (?)</p><p>`    `''', (accuracy,))</p><p>`    `conn.commit()</p><p>`    `conn.close()</p><p></p><p>def get\_best\_accuracy():</p><p>`    `conn = sqlite3.connect("/home/dev-bot/ssu\_project/scripts/" + DATABASE\_NAME)</p><p>`    `cursor = conn.cursor()</p><p>`    `cursor.execute('''</p><p>`    `SELECT MAX(accuracy) FROM model\_accuracy</p><p>`    `''')</p><p>`    `result = cursor.fetchone()</p><p>`    `conn.close()</p><p>`    `return result[0] if result[0] is not None else 0.0</p>|
-| :- |
+```python
+def add_question(user_id, question, label):
+    conn = sqlite3.connect("/home/dev-bot/ssu_project/scripts/" + DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO questions (user_id, question, label, used)
+    VALUES (?, ?, ?, 0)
+    ''', (user_id, question, label))
+    conn.commit()
+    conn.close()
+
+def add_unclassified_question(user_id, question):
+    conn = sqlite3.connect("/home/dev-bot/ssu_project/scripts/" + DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO unclassified_questions (user_id, question)
+    VALUES (?, ?)
+    ''', (user_id, question))
+    conn.commit()
+    conn.close()
+
+def add_model_accuracy(accuracy):
+    conn = sqlite3.connect("/home/dev-bot/ssu_project/scripts/" + DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO model_accuracy (accuracy)
+    VALUES (?)
+    ''', (accuracy,))
+    conn.commit()
+    conn.close()
+
+def get_best_accuracy():
+    conn = sqlite3.connect("/home/dev-bot/ssu_project/scripts/" + DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+    SELECT MAX(accuracy) FROM model_accuracy
+    ''')
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result[0] is not None else 0.0
+```
 
 `	`Используя SQL запросы и встроенную библиотеку Python sqlite3, идет подключение к базе данных в директории виртуальной машины, далее путем запросов извлекаются или помещаются новые данные.
 
 `	`Для дообучения модели из таблицы questions извлекаются вопросы, которые не были ранее использованы, то есть с флагом used = 0. Ниже представлен код для считывания соответствующих записей из базы данных.
 
-|<p>def check\_new\_data():</p><p>`    `conn = sqlite3.connect('/home/dev-bot/ssu\_project/scripts/questions.db')</p><p>`    `cursor = conn.cursor()</p><p>`    `cursor.execute('''</p><p>`    `SELECT COUNT(\*) FROM questions WHERE used = 0 GROUP BY label HAVING COUNT(\*) >= 10</p><p>`    `''')</p><p>`    `result = cursor.fetchall()</p><p>`    `conn.close()</p><p>`    `return len(result) > 0</p>|
-| :- |
+```python
+def check_new_data():
+    conn = sqlite3.connect('/home/dev-bot/ssu_project/scripts/questions.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+    SELECT COUNT(*) FROM questions WHERE used = 0 GROUP BY label HAVING COUNT(*) >= 10
+    ''')
+    result = cursor.fetchall()
+    conn.close()
+    return len(result) > 0
+```
 
 |![](Aspose.Words.e49d22f9-b97e-44ad-ba3b-2eb0ed884377.002.png)|
 | :- |
