@@ -60,8 +60,45 @@
 
 `	`Для создания базы и основных таблиц используется следующий код:
 
-|<p>```DATABASE\_NAME = 'questions.db'</p><p></p><p>def create\_tables():</p><p>`    `conn = sqlite3.connect("/home/dev-bot/ssu\_project/scripts/" + DATABASE\_NAME)</p><p>`    `cursor = conn.cursor()</p><p></p><p>`    `cursor.execute('''</p><p>`    `CREATE TABLE IF NOT EXISTS questions (</p><p>`        `id INTEGER PRIMARY KEY AUTOINCREMENT,</p><p>`        `user\_id INTEGER,</p><p>`        `question TEXT,</p><p>`        `label INTEGER,</p><p>`        `used INTEGER DEFAULT 0,</p><p>`        `timestamp DATETIME DEFAULT CURRENT\_TIMESTAMP</p><p>`    `)</p><p>`    `''')</p><p></p><p>`    `cursor.execute('''</p><p>`    `CREATE TABLE IF NOT EXISTS unclassified\_questions (</p><p>`        `id INTEGER PRIMARY KEY AUTOINCREMENT,</p><p>`        `user\_id INTEGER,</p><p>`        `question TEXT,</p><p>`        `timestamp DATETIME DEFAULT CURRENT\_TIMESTAMP</p><p>`    `)</p><p>`    `''')</p><p></p><p>`    `cursor.execute('''</p><p>`    `CREATE TABLE IF NOT EXISTS model\_accuracy (</p><p>`        `id INTEGER PRIMARY KEY AUTOINCREMENT,</p><p>`        `accuracy REAL,</p><p>`        `timestamp DATETIME DEFAULT CURRENT\_TIMESTAMP</p><p>`    `)</p><p>`    `''')</p><p></p><p>`    `conn.commit()</p><p>`    `conn.close()```</p>|
-| :- |
+```python
+DATABASE_NAME = 'questions.db'
+
+def create_tables():
+    conn = sqlite3.connect("/home/dev-bot/ssu_project/scripts/" + DATABASE_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        question TEXT,
+        label INTEGER,
+        used INTEGER DEFAULT 0,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS unclassified_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        question TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS model_accuracy (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        accuracy REAL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+```
 
 База данных имеет три основные таблицы, это model\_accuracy, для хранения лучшей метрики accuracy для сравнения после дообучения модели, таблицу questions, для вопросов используемых при дообучении, а также unclassified\_questions, для вопросов, которые не получилось классифицировать вообще.
 
